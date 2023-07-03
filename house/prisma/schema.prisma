@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Sensors {
+    sensor_id Int      @id @default(autoincrement())
+    state     String    @default("CLOSED")
+    pincode   String
+    window    Windows?
+    door      Doors?
+}
+
+model Windows {
+    window_id Int     @id @default(autoincrement())
+    sensor_id Int     @unique
+    sensor    Sensors @relation(fields: [sensor_id], references: [sensor_id])
+    house     Houses? @relation(fields: [house_id], references: [house_id])
+    house_id  Int?
+}
+
+model Doors {
+    door_id   Int     @id @default(autoincrement())
+    sensor_id Int     @unique
+    sensor    Sensors @relation(fields: [sensor_id], references: [sensor_id])
+    house_id  Int     @unique
+    house     Houses  @relation(fields: [house_id], references: [house_id])
+}
+
+model Houses {
+    house_id Int       @id @default(autoincrement())
+    windows  Windows[]
+    Door     Doors?
+}
