@@ -1,5 +1,4 @@
-export enum MessagingCodes {
-    ADD_HOUSE,
-    CONTROL_DOOR,
-    CONTROL_WINDOW
+export enum OwnerMessagingCodes {
+    REGISTER_OWNER = 'REGISTER_OWNER',
+    LOGIN_OWNER = "LOGIN_OWNER"
 }

@@ -61,4 +61,78 @@ export class House {
             throw error
         }
     }
+
+    public static async getHouse(house_id: number) {
+        try{
+            const [door, windows, houseJson] = await Promise.all([
+                await Door.findDoorByHouseId(house_id),
+                await Window.findWindows(house_id),
+                { house_id: house_id }
+            ]);
+    
+            const doorJson = await Door.generateDoorJson(door.door_id);
+    
+            const windowJsons = await Promise.all(
+                windows.map(window => Window.generateWindowJson(window.window_id))
+            );
+    
+            const pre_result = _.set(houseJson, 'door', doorJson);
+            const result = _.set(pre_result, 'windows', windowJsons);
+            return result;
+        }catch(error){
+            console.log('Error while getting the house: ', error)
+            throw error
+        }
+    }
+
+    public static async getHouses() {
+        try {
+            const housesFromDb = await PrismaConnection.prisma.houses.findMany({
+                select: { house_id: true }
+            })
+
+            const houseCompleteJsons = []
+            for (const house of housesFromDb) {
+                const houseJson = await this.getHouse(house.house_id);
+                houseCompleteJsons.push(houseJson)
+            }
+            return houseCompleteJsons
+        }
+        catch (error) {
+            console.log('Error while getting houses: ', error)
+            throw error
+        }
+    }
+
+    public static async deleteHouse(house_id: number) {
+        try {
+            const deletedHouse = await this.getHouse(house_id)
+
+            // Find the house with the given house_id
+            const house = await PrismaConnection.prisma.houses.findUnique({
+                where: { house_id: house_id },
+            });
+
+            if (!house) {
+                throw new Error(`House with house_id ${house_id} not found`);
+            }
+
+            // Delete the associated door
+            await Door.deleteDoorByHouseId(house_id);
+
+            // Delete the associated windows
+            await Window.deleteWindowsByHouseId(house_id);
+
+            // Delete the house
+            await PrismaConnection.prisma.houses.delete({
+                where: { house_id: house_id },
+            });
+
+            return deletedHouse 
+
+        } catch (error) {
+            console.error('Error while deleting the house: ', error);
+            throw error;
+        }
+    }
 }

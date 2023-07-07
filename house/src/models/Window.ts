@@ -25,17 +25,16 @@ export class Window {
         this.sensor = value
     }
 
-    public async saveWindow(information: any) {
+    public async saveWindow(data: any) {
         const sensorFromDb = await this.sensor.saveSensor()
         const windowFromDb = await PrismaConnection.prisma.windows.create({
             data: {
                 sensor_id: sensorFromDb.sensor_id,
-                house_id: information.house_id,
+                house_id: data.house_id,
             },
         })
 
-        const result = _.set(windowFromDb, 'sensor', sensorFromDb)
-        return result
+        return Window.generateWindowJson(windowFromDb.window_id)
     }
 
     public static async controlWindow(data: any) {
@@ -66,6 +65,34 @@ export class Window {
         return windowsCompleteJsonList
     }
 
+    public static async deleteWindowsByHouseId(house_id: number) {
+        try {
+            // Find the windows associated with the given house_id
+            const windows = await this.findWindows(house_id)
+    
+            if (!windows || windows.length === 0) {
+                throw new Error(`No windows associated with house_id ${house_id} found`);
+            }
+    
+            // Delete each window
+            for (const window of windows) {
+                await Window.deleteWindow(window.window_id)
+            }
+    
+            console.log(`Windows associated with house_id ${house_id} have been deleted`);
+        } catch (error) {
+            console.error('Error while deleting the windows: ', error);
+            throw error;
+        }
+    }
+
+    private static async deleteWindow(window_id: number) {
+        const window = await PrismaConnection.prisma.windows.delete({
+            where: { window_id: window_id },
+        })
+        await Sensor.deleteSensor(window.sensor_id)
+    }
+
     public static async generateWindowJson(window_id: number): Promise<any> {
         const window = await this.findWindow(window_id)
         const sensor_id = window.sensor_id
@@ -87,4 +114,5 @@ export class Window {
             throw error
         }
     }
+    
 }

@@ -1,53 +1,54 @@
-import { Request, Response } from "express"
-import { RabbitMQConnection } from "./RabbitMQConnection"
 import { log } from "console"
-import { MessagingCodes } from "./MessagingCodes.enum"
-import { v4 as uuidv4 } from "uuid"
+import { OwnerMessagingCodes } from "./MessagingCodes.enum"
+import { RabbitMQConnection } from "./RabbitMQConnection"
 import * as amqp from "amqplib"
-import { QUEUE_1 } from ".."
+import { OwnerService } from "../services/OwnerService"
 
 export class MessageHandler {
-    public static requestIdMap: Map<string, { req: Request; res: Response }> = new Map()
-    public static token: string
 
-    public static async sendMessageToQueue(messageType: MessagingCodes, requestData: any, req: Request, res: Response): Promise<string> {
+    public static async handleMessage(msg: amqp.ConsumeMessage | null, queueName: string) {
+        const informationString: string = msg!.content.toString('utf8')
+        const information: {id: string, type: OwnerMessagingCodes, data: any} = JSON.parse(informationString)
+        const messageId: string = information.id
+        const responseObject: any = await MessageHandler.manipulateDatabase(information, queueName)
+        RabbitMQConnection.channel!.ack(msg!)
+
+        await MessageHandler.sendResponseToQueue(responseObject, queueName, messageId)
+    }
+
+    private static async manipulateDatabase(information: {id: string, type: OwnerMessagingCodes, data: any}, queueName: string) {
         try {
-            const messageId = uuidv4()
-            const message = {
+            return await MessageHandler.executeCRUD(information)
+        } catch (error: any) {
+            log("sending error as response")
+            await RabbitMQConnection.sendMessage({ id: information.id, error: error.message }, queueName)
+        }
+    }
+
+    private static async executeCRUD(information: {id: string, type: OwnerMessagingCodes, data: any}) {
+
+        const messageDestination: OwnerMessagingCodes = information.type
+        const data: any = information.data
+
+        switch (messageDestination) {
+            case OwnerMessagingCodes.REGISTER_OWNER:
+                return await OwnerService.registerOwner(data)
+
+            case OwnerMessagingCodes.LOGIN_OWNER:
+                return await OwnerService.loginOwner(data)
+
+            default:
+                log("Invalid message destination")
+                break
+        }
+    }
+
+    private static async sendResponseToQueue(responseObject: any, queueName: string, messageId: string) {
+        if (responseObject) {
+            await RabbitMQConnection.sendMessage({
                 id: messageId,
-                type: messageType,
-                data: requestData,
-            }
-
-            await RabbitMQConnection.sendMessage(message, QUEUE_1)
-            MessageHandler.setRequestData(messageId, req, res)
-            return messageId
-        } catch (error) {
-            log(error)
-            throw new Error("Failed to send message to queue.")
+                data: { ...responseObject },
+            }, queueName)
         }
-    }
-
-    public static async receiveResponse(msg: amqp.ConsumeMessage) {
-        const informationString: string = msg.content.toString('utf8')
-        const responseJson: any = JSON.parse(informationString)
-        const id = responseJson.id
-        const err = responseJson.error
-        const data = responseJson.data
-        if (err) {
-            const response = MessageHandler.requestIdMap.get(id)?.res
-            if (response) {
-                response.status(404).json({ error: err })
-            }
-        } else {
-            MessageHandler.requestIdMap.get(id)?.res.json({
-                ...data,
-            })
-        }
-        RabbitMQConnection.channel!.ack(msg)
-    }
-
-    private static setRequestData(messageId: string, req: Request, res: Response) {
-        MessageHandler.requestIdMap.set(messageId, { req, res })
     }
 }

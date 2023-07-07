@@ -36,6 +36,7 @@ model Doors {
 
 model Houses {
     house_id Int       @id @default(autoincrement())
+    owner_id Int    @default(1)
     windows  Windows[]
     Door     Doors?
 }

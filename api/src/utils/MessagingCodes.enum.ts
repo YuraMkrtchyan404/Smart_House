@@ -8,3 +8,11 @@ export enum HouseMessagingCodes {
     DELETE_HOUSE = 'DELETE_HOUSE',
     GET_WINDOWS = 'GET_WINDOWS',
 }
+
+
+export enum OwnerMessagingCodes {
+    REGISTER_OWNER = 'REGISTER_OWNER',
+    LOGIN_OWNER = 'LOGIN_OWNER'
+}
+
+export type MessagingCodes = HouseMessagingCodes | OwnerMessagingCodes;

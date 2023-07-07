@@ -49,16 +49,16 @@ export class Sensor {
 
     public static async updateState(data: any): Promise<any> {
         try {
-            if(await this.correctPin(data)){
+            if (await this.correctPin(data)) {
                 const sensor_id = parseInt(data.sensor_id)
                 const sensorFromDb = await this.findSensor(sensor_id)
                 const currentState: string = (sensorFromDb).state
                 const newState: string = data.state
-                
+
                 if (currentState === newState) {
                     throw new Error('The sensor is already in the state of ' + newState)
                 }
-                else{
+                else {
                     const updatedSensor = PrismaConnection.prisma.sensors.update({
                         where: { sensor_id: sensorFromDb.sensor_id },
                         data: {
@@ -69,7 +69,7 @@ export class Sensor {
                     return updatedSensor
                 }
             }
-            else{
+            else {
                 return { error: 'Wrong PIN' }
             }
         } catch (error) {
@@ -79,9 +79,6 @@ export class Sensor {
 
     public static async findSensor(sensor_id: number) {
         try {
-            if (!sensor_id) {
-                throw new Error('Cannot find sensor without ID')
-            }
             const sensor = await PrismaConnection.prisma.sensors.findUniqueOrThrow({
                 where: { sensor_id: sensor_id },
             })
@@ -92,13 +89,23 @@ export class Sensor {
         }
     }
 
+    public static async deleteSensor(sensor_id: number) {
+        try {
+            const sensor = await PrismaConnection.prisma.sensors.delete({
+                where: { sensor_id: sensor_id }
+            })
+        } catch (error) {
+            console.error('Error while deleting the sensor: ', error)
+        }
+    }
+
     private static async correctPin(data: any) {
-        try{
+        try {
             const sensor_id = parseInt(data.sensor_id)
             const sentPin = data.pincode
             const actualPin = (await this.findSensor(sensor_id)).pincode
             return sentPin === actualPin
-        } catch(error){
+        } catch (error) {
             console.error('Error while checking the PIN: ', error)
             throw error
         }

@@ -1,39 +1,26 @@
-import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
-import { RabbitMQConnection } from "./utils/RabbitMQConnection";
-import { error, log } from "console";
-import { HouseRoutes } from "./routes/HouseRoutes";
-import { MessageHandler} from "./utils/MessageHandler"
+import { RabbitMQConnection } from "./utils/RabbitMQConnection"
+import { error } from "console"
+import { MessageHandler } from "./utils/MessageHandler"
+require('dotenv').config({ path: '.env' });
 
-const app = express();
 const URL = process.env.RABBITMQ_URL
-export const QUEUE_2 = "queue2";
-export const QUEUE_1 = "queue1";
-const port = 3000;
-require("dotenv").config({ path: ".env" });
-
-app.use(bodyParser.json());
-app.use(cors());
+export const QUEUE_3 = "queue3";
+export const QUEUE_4 = "queue4";
 
 const main = async () => {
-  const userRoutes = new HouseRoutes();
-  app.use(userRoutes.getRouter());
 
-  await RabbitMQConnection.init(URL!, QUEUE_1);
-  await RabbitMQConnection.consumeMessage(QUEUE_2, MessageHandler.receiveResponse).catch(
-    (err) => {
-      error("Failed to consume the message:", err);
-      process.exit(1);
-    }
-  );
-};
+    await RabbitMQConnection.init(URL!, QUEUE_4)
+    await RabbitMQConnection.consumeMessage(QUEUE_3, (msg) => {
+        MessageHandler.handleMessage(msg, QUEUE_4)
+    }).catch((err) => {
+        console.error("Failed to consume the message:", err)
+        process.exit(1)
+    })
+    console.log('Started consuming from queue3')
 
-app.listen(port, async () => {
-  console.log("Server listening on port 3000");
-});
+}
 
 main().catch((err) => {
-  error("Failed to initialize the app:", err);
-  process.exit(1);
-});
+    error("Failed to initialize the app:", err)
+    process.exit(1)
+})

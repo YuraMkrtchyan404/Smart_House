@@ -1,7 +1,7 @@
 import * as amqp from 'amqplib'
 import { log } from "console"
 import { RabbitMQConnection } from './RabbitMQConnection'
-import { MessagingCodes } from './MessagingCodes.enum'
+import { HouseMessagingCodes } from './MessagingCodes.enum'
 import { HouseService } from '../services/HouseService'
 import { DoorService } from '../services/DoorService'
 import { WindowService } from '../services/WindowService'
@@ -10,7 +10,7 @@ export class MessageHandler {
 
     public static async handleMessage(msg: amqp.ConsumeMessage | null, queueName: string) {
         const informationString: string = msg!.content.toString('utf8')
-        const information: {id: string, type: MessagingCodes, data: any} = JSON.parse(informationString)
+        const information: {id: string, type: HouseMessagingCodes, data: any} = JSON.parse(informationString)
         const messageId: string = information.id
         const responseObject: any = await MessageHandler.manipulateDatabase(information, queueName)
         RabbitMQConnection.channel!.ack(msg!)
@@ -18,7 +18,7 @@ export class MessageHandler {
         await MessageHandler.sendResponseToQueue(responseObject, queueName, messageId)
     }
 
-    private static async manipulateDatabase(information: {id: string, type: MessagingCodes, data: any}, queueName: string) {
+    private static async manipulateDatabase(information: {id: string, type: HouseMessagingCodes, data: any}, queueName: string) {
         try {
             return await MessageHandler.executeCRUD(information)
         } catch (error: any) {
@@ -27,20 +27,35 @@ export class MessageHandler {
         }
     }
 
-    private static async executeCRUD(information: {id: string, type: MessagingCodes, data: any}) {
+    private static async executeCRUD(information: {id: string, type: HouseMessagingCodes, data: any}) {
 
-        const messageDestination: MessagingCodes = information.type
+        const messageDestination: HouseMessagingCodes = information.type
 
         switch (messageDestination) {
 
-            case MessagingCodes.ADD_HOUSE:
+            case HouseMessagingCodes.ADD_HOUSE:
                 return await HouseService.addHouse(information)
 
-            case MessagingCodes.CONTROL_DOOR:
+            case HouseMessagingCodes.CONTROL_DOOR:
                 return await DoorService.controlDoor(information)
 
-            case MessagingCodes.CONTROL_WINDOW:
+            case HouseMessagingCodes.CONTROL_WINDOW:
                 return await WindowService.controlWindow(information)
+
+            case HouseMessagingCodes.GET_HOUSES:
+                return await HouseService.getHouses()
+
+            case HouseMessagingCodes.GET_HOUSE:
+                return await HouseService.getHouse(information)
+
+            case HouseMessagingCodes.ADD_WINDOW:
+                return await WindowService.addWindow(information)
+
+            case HouseMessagingCodes.DELETE_HOUSE:
+                return await HouseService.deleteHouse(information)
+
+            case HouseMessagingCodes.GET_WINDOWS:
+                return await WindowService.getWindows(information)
 
             default:
                 log("Invalid message destination")

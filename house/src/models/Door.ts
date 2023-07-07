@@ -62,11 +62,48 @@ export class Door {
         return _.set(result, 'door', updatedDoorFromDb)
     }
 
+    public static async deleteDoorByHouseId(house_id: number) {
+        try {
+            // Find the door associated with the given house_id
+            const door = await this.findDoorByHouseId(house_id)
+    
+            if (!door) {
+                throw new Error(`Door associated with house_id ${house_id} not found`);
+            }
+            
+            const sensor_id = door.sensor_id
+            const sensor = await Sensor.deleteSensor(sensor_id)
+
+            // Delete the door
+            await PrismaConnection.prisma.doors.delete({
+                where: { house_id: house_id },
+            });
+    
+            console.log(`Door associated with house_id ${house_id} has been deleted`);
+        } catch (error) {
+            console.error('Error while deleting the door: ', error);
+            throw error;
+        }
+    }
+    
+
     public static async generateDoorJson(door_id: number) {
         const door = await this.findDoor(door_id)
         const sensor_id = door.sensor_id
         const sensor = await Sensor.findSensor(sensor_id)
         return _.set(door, 'sensor', sensor)
+    }
+
+    public static async findDoorByHouseId(house_id: number) {
+        try {
+            const door = await PrismaConnection.prisma.doors.findUniqueOrThrow({
+                where: { house_id: house_id },
+            })
+            return door
+        } catch (error) {
+            console.error('Error while getting the door: ', error)
+            throw error
+        }
     }
 
     private static async findDoor(door_id: number) {
@@ -83,5 +120,4 @@ export class Door {
             throw error
         }
     }
-
 }
