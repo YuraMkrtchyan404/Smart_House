@@ -6,7 +6,7 @@ import _ from "lodash"
 
 export class OwnerService {
     public static async registerOwner(data: { name: string, password: string, email: string }) {
-        const ownerWithoutPassword = await (new Owner(data)).saveOwner()
+        const ownerWithoutPassword = await (new Owner(data.name, data.password, data.email)).saveOwner()
         const owner_id = ownerWithoutPassword.owner_id.toString()
         const token = OwnerService.generateToken(owner_id)
 
@@ -15,7 +15,7 @@ export class OwnerService {
 
     public static async loginOwner(data: { email: string, password: string }) {
         const password: string = data.password
-        const owner = await new Owner(data).findOwnerByEmail()
+        const owner = await new Owner(undefined, data.password, data.email).findOwnerByEmail()
 
         if (owner && await bcrypt.compare(password, owner.password)) {
             const token = OwnerService.generateToken(owner.owner_id.toString())

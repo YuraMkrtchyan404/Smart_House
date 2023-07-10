@@ -27,12 +27,7 @@ export class Owner{
 		this.email = v
 	}
 
-	constructor(ownerInformation: any) {
-		const name: string = ownerInformation.name
-		const password: string = ownerInformation.password
-		const owner_id: string = ownerInformation.id
-		const email: string = ownerInformation.email
-
+	constructor(name: string | undefined, password: string | undefined, email: string | undefined, owner_id?: number) {
 		if (name) {
 			this.name = name
 		}
@@ -40,7 +35,7 @@ export class Owner{
 			this.password = password
 		}
 		if (owner_id) {
-			this.owner_id = parseInt(owner_id)
+			this.owner_id = owner_id
 		}
 		if (email) {
 			this.email = email

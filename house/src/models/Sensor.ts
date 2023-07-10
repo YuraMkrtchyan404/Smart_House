@@ -1,6 +1,7 @@
 import { PrismaConnection } from "../utils/PrismaConnection"
 import { State } from "../utils/State.enum"
 import _ from 'lodash'
+import bcrypt from 'bcrypt'
 
 
 export class Sensor {
@@ -36,34 +37,41 @@ export class Sensor {
     }
 
     public async saveSensor() {
-        const stateName = State[this.state]
-        const sensorFromDb = await PrismaConnection.prisma.sensors.create({
-            data: {
-                state: stateName,
-                pincode: this.pincode,
-            },
-        })
-        const sensorWithoutPin = _.omit(sensorFromDb, 'pincode')
-        return sensorWithoutPin
+        try{
+            if (this.pincode){
+                const hashedPincode: string = await bcrypt.hash(this.pincode, 10)
+                this.pincode = hashedPincode
+            }
+            const stateName = State[this.state]
+            const sensorFromDb = await PrismaConnection.prisma.sensors.create({
+                data: {
+                    state: stateName,
+                    pincode: this.pincode,
+                },
+            })
+            const sensorWithoutPin = _.omit(sensorFromDb, 'pincode')
+            return sensorWithoutPin
+        } catch (error) {
+			console.log('Error while adding new sensor: ', error)
+			throw error
+		}
     }
 
-    public static async updateState(data: any): Promise<any> {
+    public static async updateState(sensor_id: number, sentPin: string, sentState: string): Promise<any> {
         try {
-            if (await this.correctPin(data)) {
-                const sensor_id = parseInt(data.sensor_id)
+            if (await this.correctPin(sensor_id, sentPin)) {
                 const sensorFromDb = await this.findSensor(sensor_id)
                 const currentState: string = (sensorFromDb).state
-                const newState: string = data.state
 
-                if (currentState === newState) {
-                    throw new Error('The sensor is already in the state of ' + newState)
+                if (currentState === sentState) {
+                    throw new Error('The sensor is already in the state of ' + sentState)
                 }
                 else {
                     const updatedSensor = PrismaConnection.prisma.sensors.update({
                         where: { sensor_id: sensorFromDb.sensor_id },
                         data: {
                             pincode: sensorFromDb.pincode,
-                            state: newState
+                            state: sentState
                         }
                     })
                     return updatedSensor
@@ -94,17 +102,16 @@ export class Sensor {
             const sensor = await PrismaConnection.prisma.sensors.delete({
                 where: { sensor_id: sensor_id }
             })
+            return sensor
         } catch (error) {
             console.error('Error while deleting the sensor: ', error)
         }
     }
 
-    private static async correctPin(data: any) {
+    private static async correctPin(sensor_id: number, sentPin: string) {
         try {
-            const sensor_id = parseInt(data.sensor_id)
-            const sentPin = data.pincode
             const actualPin = (await this.findSensor(sensor_id)).pincode
-            return sentPin === actualPin
+            return bcrypt.compare(sentPin, actualPin)
         } catch (error) {
             console.error('Error while checking the PIN: ', error)
             throw error

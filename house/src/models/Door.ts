@@ -8,11 +8,11 @@ export class Door {
     private door_id?: number
     private sensor: Sensor
 
-    constructor(information: any) {
-        if (information.door_id) {
-            this.door_id = information.door_id
+    constructor(pincode: string, door_id?: number) {
+        if (door_id) {
+            this.door_id = door_id
         }
-        this.sensor = new Sensor(information.pincode)
+        this.sensor = new Sensor(pincode)
     }
 
     public getId(): number | undefined {
@@ -25,12 +25,12 @@ export class Door {
         this.sensor = sensor
     }
 
-    public async saveDoor(data: any) {
+    public async saveDoor(house_id: number) {
         const sensorFromDb = await this.sensor.saveSensor()
         const doorFromDb = await PrismaConnection.prisma.doors.create({
             data: {
                 sensor_id: sensorFromDb.sensor_id,
-                house_id: data.house_id,
+                house_id: house_id,
             },
         })
 
@@ -38,20 +38,17 @@ export class Door {
         return result
     }
 
-    public static async controlDoor(data: any) {
-        log(data)
-        const door_id: number = parseInt(data.door_id)
+    public static async controlDoor(door_id: number, sentPin: string, sentState: string) {
         const door = await this.findDoor(door_id)
-
-        //CHECK FOR OPEN WINDOWS
+        const sensor_id = door.sensor_id
         const house_id = door.house_id
+        
+        //CHECK FOR OPEN WINDOWS
         const windowsFromDb = await Window.findWindows(house_id)
         const thereIsOpenWindow = windowsFromDb.some(window => window.sensor.state === 'OPEN')
-
+        
         //UPDATE THE SENSOR
-        const sensor_id = door.sensor_id
-        const dataWithSensorId = _.set(data, "sensor_id", sensor_id)
-        const updatedSensor = await Sensor.updateState(dataWithSensorId)
+        await Sensor.updateState(sensor_id, sentPin, sentState)
 
         //GENERATE RESULTING JSON
         let result = {}
@@ -64,17 +61,13 @@ export class Door {
 
     public static async deleteDoorByHouseId(house_id: number) {
         try {
-            // Find the door associated with the given house_id
             const door = await this.findDoorByHouseId(house_id)
-    
             if (!door) {
                 throw new Error(`Door associated with house_id ${house_id} not found`);
             }
-            
             const sensor_id = door.sensor_id
-            const sensor = await Sensor.deleteSensor(sensor_id)
+            await Sensor.deleteSensor(sensor_id)
 
-            // Delete the door
             await PrismaConnection.prisma.doors.delete({
                 where: { house_id: house_id },
             });
@@ -106,7 +99,7 @@ export class Door {
         }
     }
 
-    private static async findDoor(door_id: number) {
+    public static async findDoor(door_id: number) {
         try {
             if (!door_id) {
                 throw new Error('Cannot find door without ID')

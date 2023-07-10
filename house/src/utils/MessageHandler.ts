@@ -30,32 +30,33 @@ export class MessageHandler {
     private static async executeCRUD(information: {id: string, type: HouseMessagingCodes, data: any}) {
 
         const messageDestination: HouseMessagingCodes = information.type
+        const data = information.data
 
         switch (messageDestination) {
 
             case HouseMessagingCodes.ADD_HOUSE:
-                return await HouseService.addHouse(information)
+                return await HouseService.addHouse(data)
 
             case HouseMessagingCodes.CONTROL_DOOR:
-                return await DoorService.controlDoor(information)
+                return await DoorService.controlDoor(data)
 
             case HouseMessagingCodes.CONTROL_WINDOW:
-                return await WindowService.controlWindow(information)
+                return await WindowService.controlWindow(data)
 
             case HouseMessagingCodes.GET_HOUSES:
                 return await HouseService.getHouses()
 
             case HouseMessagingCodes.GET_HOUSE:
-                return await HouseService.getHouse(information)
+                return await HouseService.getHouse(data)
 
             case HouseMessagingCodes.ADD_WINDOW:
-                return await WindowService.addWindow(information)
+                return await WindowService.addWindow(data)
 
             case HouseMessagingCodes.DELETE_HOUSE:
-                return await HouseService.deleteHouse(information)
+                return await HouseService.deleteHouse(data)
 
             case HouseMessagingCodes.GET_WINDOWS:
-                return await WindowService.getWindows(information)
+                return await WindowService.getWindows(data)
 
             default:
                 log("Invalid message destination")

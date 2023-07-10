@@ -1,18 +1,17 @@
 import { Sensor } from "./Sensor"
 import { PrismaConnection } from "../utils/PrismaConnection"
 import _ from 'lodash'
-import { log } from "console"
 
 export class Window {
 
     private window_id?: number
     private sensor: Sensor
 
-    constructor(information: any) {
-        if (information.window_id) {
-            this.window_id = information.window_id
+    constructor(pincode: string, window_id?: number) {
+        if (window_id) {
+            this.window_id = window_id
         }
-        this.sensor = new Sensor(information.pincode)
+        this.sensor = new Sensor(pincode)
     }
 
     public getWindowId(): number | undefined {
@@ -25,33 +24,29 @@ export class Window {
         this.sensor = value
     }
 
-    public async saveWindow(data: any) {
+    public async saveWindow(house_id: number) {
         const sensorFromDb = await this.sensor.saveSensor()
         const windowFromDb = await PrismaConnection.prisma.windows.create({
             data: {
                 sensor_id: sensorFromDb.sensor_id,
-                house_id: data.house_id,
+                house_id: house_id,
             },
         })
 
         return Window.generateWindowJson(windowFromDb.window_id)
     }
 
-    public static async controlWindow(data: any) {
-        log(data)
-        const window_id: number = parseInt(data.window_id)
+    public static async controlWindow(window_id: number, sentPin: string, sentState: string) {
         const window = await this.findWindow(window_id)
 
         //UPDATE THE SENSOR
         const sensor_id = window.sensor_id
-        const dataWithSensorId = _.set(data, "sensor_id", sensor_id)
-        await Sensor.updateState(dataWithSensorId)
+        await Sensor.updateState(sensor_id, sentPin, sentState)
 
         //GENERATE RESULTING JSON
         let result = {}
         const updatedWindowFromDb = await this.generateWindowJson(window_id)
         return _.set(result, 'window', updatedWindowFromDb)
-
     }
 
     public static async findWindows(house_id: number) {
@@ -100,7 +95,7 @@ export class Window {
         return _.set(window, 'sensor', sensor)
     }
 
-    private static async findWindow(window_id: number) {
+    public static async findWindow(window_id: number) {
         try {
             if (!window_id) {
                 throw new Error('Cannot find window without ID')

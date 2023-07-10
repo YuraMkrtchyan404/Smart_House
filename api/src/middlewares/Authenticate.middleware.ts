@@ -13,7 +13,7 @@ export class AuthenticateMiddleware {
         try {
             const jwt_secret_key = process.env.JWT_SECRET_KEY
             const decoded = jwt.verify(token, jwt_secret_key!)
-            req.body.decodedUser = decoded
+            req.body.decodedOwner = decoded
             next()
         } catch (err) {
             return res.status(401).send({ error: err })
