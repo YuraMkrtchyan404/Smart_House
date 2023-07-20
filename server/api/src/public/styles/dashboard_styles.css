@@ -1,0 +1,134 @@
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f2f2f2;
+	margin: 0;
+	padding: 0;
+  }
+  
+  .container {
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	height: 100vh;
+	overflow: auto;
+	padding: 2rem;
+	box-sizing: border-box;
+  }
+  
+  h1 {
+	margin-top: 0;
+	margin-bottom: 2rem;
+	text-align: center;
+	color: #333;
+  }
+  
+  .form-container {
+	width: 300px;
+	background-color: #fff;
+	padding: 2rem;
+	border-radius: 5px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	margin-bottom: 2rem;
+  }
+  
+  #result-container {
+	width: 900px;
+	background-color: #fff;
+	padding: 2rem;
+	border-radius: 5px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	margin-bottom: 2rem;
+  }
+  
+  #result {
+	padding: 1rem;
+	background-color: #f8f8f8;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	min-height: 200px;
+	overflow-y: auto;
+	white-space: pre-wrap; /* Preserve line breaks */
+  }
+  
+  .form-container:last-child {
+	margin-bottom: 0;
+  }
+  
+  .form-container h2 {
+	margin-top: 2rem;
+	margin-bottom: 1rem;
+	font-size: 1.2rem;
+	color: #333;
+	text-align: center;
+  }
+  
+  form {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+  }
+  
+  input,
+  select {
+	width: 100%;
+	padding: 0.5rem;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	outline: none;
+  }
+  
+  button {
+	width: 100%;
+	padding: 0.75rem;
+	background-color: #007bff;
+	color: #fff;
+	border: none;
+	border-radius: 3px;
+	cursor: pointer;
+  }
+  
+  button:hover {
+	background-color: #0056b3;
+  }
+  
+  button:disabled {
+	background-color: #ccc;
+	cursor: not-allowed;
+  }
+  
+  button:disabled:hover {
+	background-color: #ccc;
+  }
+  
+  .access-houses-form-container {
+	margin-top: 2rem;
+  }
+  
+  .register-house-form-container {
+	margin-top: 2rem;
+  }
+  
+  .access-house-form-container {
+	margin-top: 2rem;
+  }
+  
+  .control-door-form-container {
+	margin-top: 2rem;
+  }
+  
+  .control-window-form-container {
+	margin-top: 2rem;
+  }
+  
+  .delete-house-form-container {
+	margin-top: 2rem;
+  }
+  
+  .add-window-form-container {
+	margin-top: 2rem;
+  }
+  
+  .get-windows-form-container {
+	margin-top: 2rem;
+  }
+  

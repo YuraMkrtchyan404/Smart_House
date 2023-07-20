@@ -1,15 +1,109 @@
-version: "3.9"
+version: '3.9'
+
 services:
-  rabbitmq:
-    image: rabbitmq:3.9.13-management-alpine
-    container_name: 'rabbitmq'
-    restart: always
+
+  db:
+    container_name: db
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=yura
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=house_owner
     ports:
-        - 5672:5672
-        - 15672:15672
+      - "5433:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
     networks:
-        - rabbitmq_go_net
+      - rabbitmq_go_net
+    restart: always
+
+  db1:
+    container_name: db1
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=yura
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=smart_house
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./data1:/var/lib/postgresql/data
+    networks:
+      - rabbitmq_go_net
+    restart: always
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.9.13-management-alpine
+    restart: always
+    environment:
+      - "RABBITMQ_DEFAULT_PASS=password"
+      - "RABBITMQ_DEFAULT_USER=username"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - rabbitmq_go_net
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "node_health_check"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  api:
+    container_name: api
+    build:
+      context: ./server/api
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    environment:
+      JWT_SECRET_KEY: "wsdfghjlmnbvcasxdcfvb"
+      RABBITMQ_URL: "amqp://username:password@rabbitmq:5672"
+    depends_on:
+      db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - rabbitmq_go_net
+    restart: always
+
+  house:
+    container_name: house
+    build:
+      context: ./server/house
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: "postgresql://yura:password@db1:5432/smart_house?schema=public"
+      RABBITMQ_URL: "amqp://username:password@rabbitmq:5672"
+      JWT_SECRET_KEY: "wsdfghjlmnbvcasxdcfvb"
+    depends_on:
+      api:
+        condition: service_started
+    networks:
+      - rabbitmq_go_net
+    restart: always
+
+  owner:
+    container_name: owner
+    build:
+      context: ./server/owner
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: "postgresql://yura:password@db:5432/house_owner?schema=public"
+      RABBITMQ_URL: "amqp://username:password@rabbitmq:5672"
+      JWT_SECRET_KEY: "wsdfghjlmnbvcasxdcfvb"
+    depends_on:
+      api:
+        condition: service_started
+    networks:
+      - rabbitmq_go_net
+    restart: always
 
 networks:
   rabbitmq_go_net:
     driver: bridge
+
+volumes:
+  data:

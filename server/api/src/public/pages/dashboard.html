@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Dashboard</title>
+		<link rel="stylesheet" href="../styles/dashboard_styles.css" />
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="form-container">
+				<h1>Dashboard</h1>
+
+				<h2>My Houses</h2>
+				<form action="http://localhost:3000/houses" method="GET">
+					<button type="submit">Access Houses</button>
+				</form>
+
+				<h2>My House</h2>
+				<form
+					action="http://localhost:3000/houses/:house_id"
+					method="GET"
+				>
+					<input
+						type="number"
+						name="house_id"
+						placeholder="House ID"
+						required
+					/>
+					<button type="submit">Access House</button>
+				</form>
+
+				<h2>Register New House</h2>
+				<form action="http://localhost:3000/houses/new" method="POST">
+					<input
+						type="text"
+						name="pincode"
+						placeholder="Pincode"
+						required
+					/>
+					<input
+						type="number"
+						name="numberOfWindows"
+						placeholder="Number of Windows"
+						required
+					/>
+					<button type="submit">Register House</button>
+				</form>
+
+				<h2>Control Door</h2>
+				<form
+					action="http://localhost:3000/houses/doors/:door_id/control"
+					method="PUT"
+				>
+					<input
+						type="number"
+						name="door_id"
+						placeholder="Door ID"
+						required
+					/>
+					<select name="state" required>
+						<option value="OPEN">OPEN</option>
+						<option value="CLOSED">CLOSED</option>
+					</select>
+					<input
+						type="text"
+						name="pincode"
+						placeholder="Pincode"
+						required
+					/>
+					<button type="submit">Control Door</button>
+				</form>
+
+				<h2>Control Window</h2>
+				<form
+					action="http://localhost:3000/houses/windows/:window_id/control"
+					method="PUT"
+				>
+					<input
+						type="number"
+						name="window_id"
+						placeholder="Window ID"
+						required
+					/>
+					<select name="state" required>
+						<option value="OPEN">OPEN</option>
+						<option value="CLOSED">CLOSED</option>
+					</select>
+					<input
+						type="text"
+						name="pincode"
+						placeholder="Pincode"
+						required
+					/>
+					<button type="submit">Control Window</button>
+				</form>
+
+				<h2>Delete House</h2>
+				<form
+					action="http://localhost:3000/houses/:house_id"
+					method="DELETE"
+				>
+					<input
+						type="number"
+						name="house_id"
+						placeholder="House ID"
+						required
+					/>
+					<button type="submit">Delete House</button>
+				</form>
+
+				<h2>Add Window</h2>
+				<form
+					action="http://localhost:3000/houses/:house_id/windows/new"
+					method="POST"
+				>
+					<input
+						type="number"
+						name="house_id"
+						placeholder="House ID"
+						required
+					/>
+					<input
+						type="text"
+						name="pincode"
+						placeholder="Pincode for New Window"
+						required
+					/>
+					<button type="submit">Add Window</button>
+				</form>
+
+				<h2>Get Windows of a House</h2>
+				<form
+					action="http://localhost:3000/houses/:house_id/windows"
+					method="GET"
+				>
+					<input
+						type="number"
+						name="house_id"
+						placeholder="House ID"
+						required
+					/>
+					<button type="submit">Get Windows</button>
+				</form>	
+			</div>
+
+			<div id="result-container">
+				<h1>Result</h1>
+				<div id="result"></div>
+			</div>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<script src="../js/dashboard.js"></script>
+	</body>
+</html>

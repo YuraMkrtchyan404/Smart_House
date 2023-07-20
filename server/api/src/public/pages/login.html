@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Smart Home Login</title>
+		<link rel="stylesheet" href="../styles/login_styles.css" />
+	</head>
+	<body>
+		<h1>Smart Home Login</h1>
+
+		<div class="form-container" id="login-form">
+			<h2>Login</h2>
+			<form action="http://localhost:3000/owner/login" id="login-form">
+				<input type="text" placeholder="Email" id="email" required />
+				<input
+					type="password"
+					placeholder="Password"
+					id="password"
+					required
+				/>
+				<button type="submit">Login</button>
+			</form>
+			<p>
+				Don't have an account?
+				<a href="#" id="register-link">Register</a>
+			</p>
+		</div>
+
+		<div class="form-container" id="register-form" style="display: none">
+			<h2>Register</h2>
+			<form action="http://localhost:3000/owner/register" id="register-form">
+				<input
+					type="text"
+					placeholder="Name"
+					id="register-name"
+					required
+				/>
+				<input
+					type="text"
+					placeholder="Email"
+					id="register-email"
+					required
+				/>
+				<input
+					type="password"
+					placeholder="Password"
+					id="register-password"
+					required
+				/>
+				<button type="submit">Register</button>
+			</form>
+			<p>
+				Already have an account? <a href="#" id="login-link">Login</a>
+			</p>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<script src="../js/login.js"></script>
+	</body>
+</html>
