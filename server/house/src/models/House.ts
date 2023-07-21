@@ -1,3 +1,4 @@
+import { log } from "console";
 import { PrismaConnection } from "../utils/PrismaConnection";
 import { Door } from "./Door";
 import { Window } from "./Window";
@@ -45,7 +46,10 @@ export class House {
     public setHouse_id(house_id: number) {
         this.house_id = house_id
     }
-
+    /**
+     * 
+     * @returns 
+     */
     public async saveHouse() {
         try {
             const houseFromDb = await PrismaConnection.prisma.houses.create({
@@ -71,19 +75,30 @@ export class House {
             throw error
         }
     }
-
+    /**
+     * 
+     * @param house_id 
+     * @returns 
+     */
     public static async getHouse(house_id: number) {
         try {
+            log(5555555)
             const [houseJson, door, windows] = await Promise.all([
                 await House.findHouse(house_id),
                 await Door.findDoorByHouseId(house_id),
                 await Window.findWindows(house_id),
             ]);
 
-            const doorJson = await Door.generateDoorJson(door.door_id);
+            log(`houseJson: ${JSON.stringify(houseJson)}`)
+            log(`door: ${door}`)
+            log(`windows: ${JSON.stringify(windows)}`)
 
+            log(66666)
+            const doorJson = await Door.generateDoorJson(door!.door_id);
+            log(777777777)
             const pre_result = _.set(houseJson, 'door', doorJson);
             const result = _.set(pre_result, 'windows', windows);
+            log(result)
             return result;
         } catch (error) {
             console.log('Error while getting the house: ', error)
@@ -93,19 +108,24 @@ export class House {
 
     public static async getHouses(owner_id: number) {
         try {
+            log(111111)
             const housesFromDb = await PrismaConnection.prisma.houses.findMany({
                 select: { house_id: true },
                 where: { owner_id: owner_id }
             })
+            log(22222)
 
             const houseCompleteJsons = []
             for (const house of housesFromDb) {
                 const houseJson = await this.getHouse(house.house_id);
                 houseCompleteJsons.push(houseJson)
             }
+            log(333333333)
+            console.log(`houseCompleteJsons: ${houseCompleteJsons}`)
             return houseCompleteJsons
         }
         catch (error) {
+            log(444444444)
             console.log('Error while getting houses: ', error)
             throw error
         }

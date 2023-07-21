@@ -3,9 +3,9 @@ body {
 	background-color: #f2f2f2;
 	margin: 0;
 	padding: 0;
-  }
-  
-  .container {
+}
+
+.container {
 	display: flex;
 	align-items: flex-start;
 	justify-content: center;
@@ -13,34 +13,34 @@ body {
 	overflow: auto;
 	padding: 2rem;
 	box-sizing: border-box;
-  }
-  
-  h1 {
+}
+
+h1 {
 	margin-top: 0;
 	margin-bottom: 2rem;
 	text-align: center;
 	color: #333;
-  }
-  
-  .form-container {
+}
+
+.form-container {
 	width: 300px;
 	background-color: #fff;
 	padding: 2rem;
 	border-radius: 5px;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 	margin-bottom: 2rem;
-  }
-  
-  #result-container {
+}
+
+#result-container {
 	width: 900px;
 	background-color: #fff;
 	padding: 2rem;
 	border-radius: 5px;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 	margin-bottom: 2rem;
-  }
-  
-  #result {
+}
+
+#result {
 	padding: 1rem;
 	background-color: #f8f8f8;
 	border: 1px solid #ccc;
@@ -48,36 +48,68 @@ body {
 	min-height: 200px;
 	overflow-y: auto;
 	white-space: pre-wrap; /* Preserve line breaks */
-  }
-  
-  .form-container:last-child {
+}
+
+.form-container:last-child {
 	margin-bottom: 0;
-  }
-  
-  .form-container h2 {
+}
+
+.form-container h2 {
 	margin-top: 2rem;
 	margin-bottom: 1rem;
 	font-size: 1.2rem;
 	color: #333;
 	text-align: center;
-  }
-  
-  form {
+}
+
+.box {
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	padding: 10px;
+	margin: 5px 0;
+	/* background-color: #f8f8f8; */
+}
+
+.depth-0 {
+	background-color: #fef9f3;
+}
+
+.depth-1 {
+	background-color: #fbe8ce;
+}
+
+.depth-2 {
+	background-color: #f9d7a9;
+}
+
+.depth-3 {
+	background-color: #f6c684;
+}
+
+.depth-4 {
+	background-color: #f3b55f;
+}
+
+.box.open {
+	background-color: aquamarine;
+}
+
+form {
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
-  }
-  
-  input,
-  select {
+}
+
+input,
+select {
 	width: 100%;
 	padding: 0.5rem;
 	border: 1px solid #ccc;
 	border-radius: 3px;
 	outline: none;
-  }
-  
-  button {
+}
+
+button {
 	width: 100%;
 	padding: 0.75rem;
 	background-color: #007bff;
@@ -85,50 +117,49 @@ body {
 	border: none;
 	border-radius: 3px;
 	cursor: pointer;
-  }
-  
-  button:hover {
+}
+
+button:hover {
 	background-color: #0056b3;
-  }
-  
-  button:disabled {
+}
+
+button:disabled {
 	background-color: #ccc;
 	cursor: not-allowed;
-  }
-  
-  button:disabled:hover {
+}
+
+button:disabled:hover {
 	background-color: #ccc;
-  }
-  
-  .access-houses-form-container {
+}
+
+.access-houses-form-container {
 	margin-top: 2rem;
-  }
-  
-  .register-house-form-container {
+}
+
+.register-house-form-container {
 	margin-top: 2rem;
-  }
-  
-  .access-house-form-container {
+}
+
+.access-house-form-container {
 	margin-top: 2rem;
-  }
-  
-  .control-door-form-container {
+}
+
+.control-door-form-container {
 	margin-top: 2rem;
-  }
-  
-  .control-window-form-container {
+}
+
+.control-window-form-container {
 	margin-top: 2rem;
-  }
-  
-  .delete-house-form-container {
+}
+
+.delete-house-form-container {
 	margin-top: 2rem;
-  }
-  
-  .add-window-form-container {
+}
+
+.add-window-form-container {
 	margin-top: 2rem;
-  }
-  
-  .get-windows-form-container {
+}
+
+.get-windows-form-container {
 	margin-top: 2rem;
-  }
-  
+}

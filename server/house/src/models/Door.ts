@@ -87,9 +87,9 @@ export class Door {
     }
 
     public static async findDoorByHouseId(house_id: number) {
-        log('HOUSE_ID 1: ' + house_id)
+        log('HOUSE_ID: ' + house_id)
         try {
-            const door = await PrismaConnection.prisma.doors.findUniqueOrThrow({
+            const door = await PrismaConnection.prisma.doors.findUnique({
                 where: { house_id: house_id },
             })
             return door

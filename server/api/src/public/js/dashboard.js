@@ -48,32 +48,25 @@ const token = localStorage.getItem("jwtToken");
 if (token) {
 	const forms = document.querySelectorAll("form");
 	forms.forEach((form) => {
-		form.addEventListener("submit", async function (e) {
-			e.preventDefault();
-			const method = this.getAttribute("method");
-			const url = this.getAttribute("action");
-			const formData = new FormData(this);
-			const data = Object.fromEntries(formData.entries());
-
-			try {
-				const resultContainer = document.getElementById("result");
-				resultContainer.textContent = "Loading...";
-
-				const response = await sendRequestWithToken(url, method, data);
-
-				if (response.error) {
-					resultContainer.textContent = response.error;
-				} else {
-					resultContainer.textContent = JSON.stringify(
-						response,
-						null,
-						8
-					);
-				}
-			} catch (error) {
-				alert("Request failed. Please try again later.");
-				console.error("Error:", error);
-			}
-		});
+	  form.addEventListener("submit", async function (e) {
+		e.preventDefault();
+		const method = this.getAttribute("method");
+		const url = this.getAttribute("action");
+		const formData = new FormData(this);
+		const data = Object.fromEntries(formData.entries());
+  
+		try {
+		  const resultContainer = document.getElementById("result");
+		  resultContainer.textContent = "Loading...";
+  
+		  const response = await sendRequestWithToken(url, method, data);
+  
+		  // Call the displayResult function to display the response in hierarchical boxes
+		  displayResult(response);
+		} catch (error) {
+		  alert("Request failed. Please try again later.");
+		  console.error("Error:", error);
+		}
+	  });
 	});
-}
+  }

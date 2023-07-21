@@ -12,7 +12,7 @@ datasource db {
 
 model Sensors {
     sensor_id Int      @id @default(autoincrement())
-    state     String    @default("CLOSED")
+    state     String   @default("CLOSED")
     pincode   String
     window    Windows?
     door      Doors?
@@ -36,7 +36,7 @@ model Doors {
 
 model Houses {
     house_id Int       @id @default(autoincrement())
-    owner_id Int    @default(1)
+    owner_id Int       @default(1)
     windows  Windows[]
     Door     Doors?
 }
