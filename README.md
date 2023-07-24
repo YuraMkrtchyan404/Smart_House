@@ -9,7 +9,7 @@ This is an educational project, which was built by using the following tools:
 * HTML/CSS/JS
 * Docker
 
-The project containts ***3 microservices**:
+The project containts **3 microservices**:
 * api
 * house
 * owner
