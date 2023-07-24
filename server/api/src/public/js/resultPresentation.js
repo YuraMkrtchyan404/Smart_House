@@ -18,15 +18,13 @@ function createBox(element, data, depth = 0) {
 			break;
 		case "sensor":
 			heading.textContent = `Sensor ID: ${data.sensor_id}, State: ${data.state}`;
-			const box = document.getElementById(`box`);
-			// if (data.state === "OPEN") {
-			// 	const sensorBox = document.findElementByClassName
-			//     box.classList.add("open");
-			// }
 			break;
 		case "error":
 			heading.textContent = `error: ${data}`;
 			break;
+        case "warning":
+            heading.textContent = `warning: ${data}`;
+            break;
 		default:
 			heading.textContent = element;
 			break;
@@ -60,18 +58,27 @@ function displayResult(response) {
 	const resultContainer = document.getElementById("result");
 	resultContainer.textContent = "";
 
-	let houseBox;
+	let resultBox;
+	let warningBox;
 	if (typeof response === "object") {
 		if (response[0] && response[0].window_id) {
-			houseBox = createBox("Windows", response);
+			resultBox = createBox("Windows", response);
 		} else if (response[0] && response[0].house_id) {
-			houseBox = createBox("Houses", response);
+			resultBox = createBox("Houses", response);
+		} else if (response.door && !response.house_id) {
+			resultBox = createBox("door", response.door);
+			if(response.warning){
+				warningBox = createBox("warning", JSON.stringify(response.warning))
+				resultBox.appendChild(warningBox)
+			}
+		} else if (response.window && !response.house_id) {
+			resultBox = createBox("window", response.window);
 		} else if (response.error) {
-			houseBox = createBox("error", JSON.stringify(response.error));
-		} else {
-			houseBox = createBox("house", response);
+			resultBox = createBox("error", JSON.stringify(response.error));
+        } else {
+			resultBox = createBox("house", response);
 		}
-		resultContainer.appendChild(houseBox);
+		resultContainer.appendChild(resultBox);
 	} else {
 		const errorMessage = document.createElement("p");
 		errorMessage.textContent = response;
