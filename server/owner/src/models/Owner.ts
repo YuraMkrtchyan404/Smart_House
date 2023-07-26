@@ -2,6 +2,9 @@ import { PrismaConnection } from '../utils/PrismaConnection'
 import bcrypt from 'bcrypt'
 import _ from 'lodash'
 
+/**
+ * Model class for accessing and modifying owner data
+ */
 export class Owner{
 	private owner_id?: number | undefined
 	private email: string | undefined
@@ -42,6 +45,10 @@ export class Owner{
 		}
 	}
 
+	/**
+	 * Retrieves an owner from database
+	 * @returns Owner json object
+	 */
 	public async getOwner() {
 		try {
 			if (!this.owner_id) {
@@ -58,6 +65,10 @@ export class Owner{
 		}
 	}
 
+	/**
+	 * Retrieves all owners from the database
+	 * @returns Array of Owner json objects
+	 */
 	public async getOwners() {
 		try {
 			const owners = await PrismaConnection.prisma.owners.findMany()
@@ -72,6 +83,10 @@ export class Owner{
 		}
 	}
 
+	/**
+	 * Registers a new Owner to the database
+	 * @returns Owner json object
+	 */
 	public async saveOwner() {
 		try {
 			if (this.password) {
@@ -94,6 +109,10 @@ export class Owner{
 		}
 	}
 
+	/**
+	 * Updates owner data
+	 * @returns Owner json object
+	 */
 	public async updateOwner() {
 		try {
 			if (!this.owner_id) {
@@ -120,6 +139,10 @@ export class Owner{
 		}
 	}
 
+	/**
+	 * Deletes the Owner from the database
+	 * @returns Owner json object
+	 */
 	public async deleteOwner() {
 		try {
 			if (!this.owner_id) {
@@ -137,6 +160,10 @@ export class Owner{
 		}
 	}
 
+	/**
+	 * Finds Owner from database by email
+	 * @returns Owner json object
+	 */
 	public async findOwnerByEmail() {
 		try {
 			const owner = await PrismaConnection.prisma.owners.findUnique({

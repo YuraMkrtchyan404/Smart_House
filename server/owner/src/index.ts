@@ -8,8 +8,8 @@ const URL = process.env.RABBITMQ_URL
 export const QUEUE_3 = "queue3";
 export const QUEUE_4 = "queue4";
 
+// Initialize RabbitMQ connection
 const main = async () => {
-    // await PrismaConnection.createDatabase('house_owner')
 
     await RabbitMQConnection.init(URL!, QUEUE_4)
     await RabbitMQConnection.consumeMessage(QUEUE_3, (msg) => {

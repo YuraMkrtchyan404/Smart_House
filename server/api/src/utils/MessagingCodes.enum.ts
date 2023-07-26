@@ -1,3 +1,6 @@
+/**
+ * ENUMs for defining the existing message types in the project
+ */
 export enum HouseMessagingCodes {
     ADD_HOUSE = 'ADD_HOUSE',
     CONTROL_DOOR = 'CONTROL_DOOR',

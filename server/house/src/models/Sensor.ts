@@ -3,7 +3,9 @@ import { State } from "../utils/State.enum"
 import _ from 'lodash'
 import bcrypt from 'bcrypt'
 
-
+/**
+ * Model class for accessing and modifying sensor data 
+ */
 export class Sensor {
     private sensor_id?: number
     private state: State
@@ -36,9 +38,13 @@ export class Sensor {
         this.pincode = value
     }
 
-    public async saveSensor() {
-        try{
-            if (this.pincode){
+    /**
+     * Posts the sensor to the database
+     * @returns A Promise that resolves to an object containing the sensor_id and state of the saved sensor.
+     */
+    public async saveSensor(): Promise<{ sensor_id: number; state: string }> {
+        try {
+            if (this.pincode) {
                 const hashedPincode: string = await bcrypt.hash(this.pincode, 10)
                 this.pincode = hashedPincode
             }
@@ -52,11 +58,18 @@ export class Sensor {
             const sensorWithoutPin = _.omit(sensorFromDb, 'pincode')
             return sensorWithoutPin
         } catch (error) {
-			console.log('Error while adding new sensor: ', error)
-			throw error
-		}
+            console.log('Error while adding new sensor: ', error)
+            throw error
+        }
     }
 
+    /**
+     * Updates the state of the sensor to the sentState
+     * @param sensor_id 
+     * @param sentPin 
+     * @param sentState 
+     * @returns A Promise that resolves to an object containing the sensor_id, pincode and state of the saved sensor.
+     */
     public static async updateState(sensor_id: number, sentPin: string, sentState: string): Promise<any> {
         try {
             if (await this.correctPin(sensor_id, sentPin)) {
@@ -85,6 +98,11 @@ export class Sensor {
         }
     }
 
+    /**
+     * Finds the sensor from db by sensor_id
+     * @param sensor_id 
+     * @returns A Promise that resolves to sensor json
+     */
     public static async findSensor(sensor_id: number) {
         try {
             const sensor = await PrismaConnection.prisma.sensors.findUniqueOrThrow({
@@ -97,6 +115,11 @@ export class Sensor {
         }
     }
 
+    /**
+     * Deletes the sensor from bd
+     * @param sensor_id 
+     * @returns A Promise that resolves to sensor json
+     */
     public static async deleteSensor(sensor_id: number) {
         try {
             const sensor = await PrismaConnection.prisma.sensors.delete({
@@ -108,6 +131,12 @@ export class Sensor {
         }
     }
 
+    /**
+     * Checks if the sent pin is correct
+     * @param sensor_id 
+     * @param sentPin 
+     * @returns A Promise that resolves to a boolean value
+     */
     private static async correctPin(sensor_id: number, sentPin: string) {
         try {
             const actualPin = (await this.findSensor(sensor_id)).pincode

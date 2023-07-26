@@ -2,7 +2,15 @@ import { log } from "console";
 import { Door } from "../models/Door";
 import { House } from "../models/House";
 
+/**
+ * Class for business logic connected with Doors
+ */
 export class DoorService {
+    /**
+     * Utilizes Door.controlDoor according to the received data
+     * @param data 
+     * @returns Door complete json
+     */
     public static async controlDoor(data: { state: string, pincode: string, door_id: string, decodedOwner: any }) {
         const door_id: number = parseInt(data.door_id)
         const door = await Door.findDoor(door_id)

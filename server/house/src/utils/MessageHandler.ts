@@ -6,8 +6,16 @@ import { HouseService } from '../services/HouseService'
 import { DoorService } from '../services/DoorService'
 import { WindowService } from '../services/WindowService'
 
+/**
+ * Class for handling request and response messages from RabbitMQ
+ */
 export class MessageHandler {
 
+    /**
+     * Handles the request message received from RabbitMQ and sends a response message back
+     * @param msg 
+     * @param queueName 
+     */
     public static async handleMessage(msg: amqp.ConsumeMessage | null, queueName: string) {
         const informationString: string = msg!.content.toString('utf8')
         const information: {id: string, type: HouseMessagingCodes, data: any} = JSON.parse(informationString)
@@ -18,6 +26,12 @@ export class MessageHandler {
         await MessageHandler.sendResponseToQueue(responseObject, queueName, messageId)
     }
 
+    /**
+     * Manipulates the database using CRUD operations
+     * @param information 
+     * @param queueName 
+     * @returns House, door, window json object or an error message
+     */
     private static async manipulateDatabase(information: {id: string, type: HouseMessagingCodes, data: any}, queueName: string) {
         try {
             return await MessageHandler.executeCRUD(information)
@@ -27,6 +41,12 @@ export class MessageHandler {
         }
     }
 
+    /**
+     * Depending on what type of request is sent, calls the corresponding service method to execute CRUD operations
+     * on House and its components
+     * @param information 
+     * @returns House, door, window json object or an error message 
+     */
     private static async executeCRUD(information: {id: string, type: HouseMessagingCodes, data: any}) {
 
         const messageDestination: HouseMessagingCodes = information.type
@@ -64,6 +84,12 @@ export class MessageHandler {
         }
     }
 
+    /**
+     * Constructs a response json and sends it to RabbitMQ
+     * @param responseObject 
+     * @param queueName 
+     * @param messageId 
+     */
     private static async sendResponseToQueue(responseObject: any, queueName: string, messageId: string) {
         if (responseObject) {
             await RabbitMQConnection.sendMessage({

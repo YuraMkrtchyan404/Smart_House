@@ -2,6 +2,9 @@ import { Sensor } from "./Sensor"
 import { PrismaConnection } from "../utils/PrismaConnection"
 import _ from 'lodash'
 
+/**
+ * Model class for accessing and modifying window data
+ */
 export class Window {
 
     private window_id?: number
@@ -24,6 +27,11 @@ export class Window {
         this.sensor = value
     }
 
+    /**
+     * Posts the window to the database
+     * @param house_id 
+     * @returns A Promise that resolves to Window complete json
+     */
     public async saveWindow(house_id: number) {
         const sensorFromDb = await this.sensor.saveSensor()
         const windowFromDb = await PrismaConnection.prisma.windows.create({
@@ -36,6 +44,13 @@ export class Window {
         return Window.generateWindowJson(windowFromDb.window_id)
     }
 
+    /**
+     * OPENs or CLOSEs the window
+     * @param window_id 
+     * @param sentPin 
+     * @param sentState 
+     * @returns Promise that resolves to window complete json
+     */
     public static async controlWindow(window_id: number, sentPin: string, sentState: string) {
         const window = await this.findWindow(window_id)
 
@@ -49,6 +64,11 @@ export class Window {
         return _.set(result, 'window', updatedWindowFromDb)
     }
 
+    /**
+     * Generates a list of Windows by house_id
+     * @param house_id 
+     * @returns Array of Window complete jsons
+     */
     public static async findWindows(house_id: number) {
         const windows = await PrismaConnection.prisma.windows.findMany({
             where: { house_id: house_id }
@@ -60,6 +80,10 @@ export class Window {
         return windowsCompleteJsonList
     }
 
+    /**
+     * Deletes all windows associalted to house_id
+     * @param house_id 
+     */
     public static async deleteWindowsByHouseId(house_id: number) {
         try {
             // Find the windows associated with the given house_id
@@ -81,6 +105,10 @@ export class Window {
         }
     }
 
+    /**
+     * Deletes the window associated with window_id
+     * @param window_id 
+     */
     private static async deleteWindow(window_id: number) {
         const window = await PrismaConnection.prisma.windows.delete({
             where: { window_id: window_id },
@@ -88,6 +116,10 @@ export class Window {
         await Sensor.deleteSensor(window.sensor_id)
     }
 
+    /**
+     * @param window_id 
+     * @returns Window complete json 
+     */
     public static async generateWindowJson(window_id: number): Promise<any> {
         const window = await this.findWindow(window_id)
         const sensor_id = window.sensor_id
@@ -95,6 +127,11 @@ export class Window {
         return _.set(window, 'sensor', sensor)
     }
 
+    /**
+     * Finds the window by window_id
+     * @param window_id 
+     * @returns Window non-complete json
+     */
     public static async findWindow(window_id: number) {
         try {
             if (!window_id) {

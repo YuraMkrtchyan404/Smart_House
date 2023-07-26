@@ -4,12 +4,15 @@ import swaggerUi from "swagger-ui-express";
 import { log } from "console";
 import path from "path";
 
+/**
+ * Swagger configurations
+ */
 const options: swaggerJSDoc.Options = {
     definition: {
         failOnErrors: true,
         openapi: "3.0.0",
         info: {
-            title: "NodeJS and RabbitMQ Application",
+            title: "Smart Home Application",
             version: "1.0.0",
         },
         servers: [

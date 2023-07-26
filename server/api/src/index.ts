@@ -19,30 +19,11 @@ const port = 3000;
 require("dotenv").config({ path: ".env" });
 
 app.use(bodyParser.json());
-
-app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-
-  // Handle pre-flight requests
-  if (req.method === "OPTIONS") {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
-});
-
 app.use(cors());
 
-const publicPath = path.join(__dirname, "../src/public");
 
+//Mapping ceratain frontend files to their paths in the browser
+const publicPath = path.join(__dirname, "../src/public");
 app.use(express.static(publicPath));
 
 app.get("/owner/login", (req, res) => {
@@ -52,7 +33,7 @@ app.get("/dashboard", (req, res) => {
   res.sendFile(path.join(publicPath, "pages/dashboard.html"));
 })
 
-
+// Initializing the backend
 const main = async () => {
   const userRoutes = new HouseRoutes();
   const ownerRoutes = new OwnerRoutes();
@@ -75,6 +56,8 @@ const main = async () => {
     }
   );
 };
+
+// Initializing the swagger documentation
 swaggerDocs(app, port)
 
 app.listen(port, async () => {

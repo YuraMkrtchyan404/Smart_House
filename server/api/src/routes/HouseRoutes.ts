@@ -2,6 +2,9 @@ import { Router } from 'express'
 import { HouseController } from '../controllers/HouseController'
 import { AuthenticateMiddleware } from '../middlewares/Authenticate.middleware'
 
+/**
+ * Router class for House routes
+ */
 export class HouseRoutes {
     private router: Router
 
@@ -14,6 +17,10 @@ export class HouseRoutes {
         return this.router
     }
 
+    /**
+     * Connects the routes and their corresponding controllers.
+     * Defines the Swagger documentation for each endpoint.
+     */
     private setupRoutes() {
         /**
         * @openapi

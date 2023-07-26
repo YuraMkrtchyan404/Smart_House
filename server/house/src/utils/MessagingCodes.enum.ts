@@ -1,3 +1,6 @@
+/**
+ * Enum class for House messaging codes 
+ */
 export enum HouseMessagingCodes {
     ADD_HOUSE = 'ADD_HOUSE',
     CONTROL_DOOR = 'CONTROL_DOOR',

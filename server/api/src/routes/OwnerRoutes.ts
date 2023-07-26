@@ -1,6 +1,9 @@
 import { Router } from 'express'
 import { OwnerController } from '../controllers/OwnerController'
 
+/**
+ * Router class for Owner routes
+ */
 export class OwnerRoutes {
     private router: Router
 
@@ -12,7 +15,10 @@ export class OwnerRoutes {
     public getRouter() {
         return this.router
     }
-
+    /**
+     * Connects the routes and their corresponding controllers.
+     * Defines the Swagger documentation for each endpoint.
+     */
     private setupRoutes() {
         /**
          * @openapi

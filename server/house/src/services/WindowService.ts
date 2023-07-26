@@ -1,7 +1,15 @@
 import { House } from "../models/House";
 import { Window } from "../models/Window";
 
+/**
+ * Class for business logic connected with Windows
+ */
 export class WindowService {
+    /**
+     * Retrieves a list of complete Window Jsons from the database
+     * @param data 
+     * @returns Array of Window Jsons
+     */
     public static async getWindows(data: { house_id: string, decodedOwner: any }) {
         const house_id: number = parseInt(data.house_id)
         const owner_id: number = (await House.findHouse(house_id)).owner_id
@@ -14,6 +22,11 @@ export class WindowService {
         }
     }
 
+    /**
+     * OPENs and CLOSEs a window
+     * @param data 
+     * @returns Window json
+     */
     public static async controlWindow(data: { state: string, pincode: string, window_id: string, decodedOwner: any }) {
         const window_id: number = parseInt(data.window_id)
         const window = await Window.findWindow(window_id)
@@ -27,6 +40,11 @@ export class WindowService {
 
     }
 
+    /**
+     * Adds a new window to a house
+     * @param data 
+     * @returns Window json
+     */
     public static async addWindow(data: { house_id: string, pincode: string, decodedOwner: any }) {
         const owner_id: number = (await House.findHouse(parseInt(data.house_id))).owner_id
         if (parseInt(data.decodedOwner.id) === owner_id) {
